@@ -1,11 +1,13 @@
 package com.coolweather.app.activity;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -16,7 +18,7 @@ import com.coolweather.app.util.Utility;
 /**
  * Created by Administrator on 2015/9/13.
  */
-public class WeatherActivity extends AppCompatActivity {
+public class WeatherActivity extends AppCompatActivity implements View.OnClickListener {
     private LinearLayout weatherInfoLayout;
     private TextView cityNameText;
     private TextView publishText;
@@ -24,6 +26,8 @@ public class WeatherActivity extends AppCompatActivity {
     private TextView temp1Text;
     private TextView temp2Text;
     private TextView currentDateText;
+    private Button switchCity;
+    private Button refreshWeather;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +37,10 @@ public class WeatherActivity extends AppCompatActivity {
         weatherInfoLayout = (LinearLayout) findViewById(R.id.weather_info_layout);
         cityNameText = (TextView) findViewById(R.id.city_name);
         publishText = (TextView) findViewById(R.id.publish_text);
+        refreshWeather= (Button) findViewById(R.id.refresh_weather);
+        switchCity= (Button) findViewById(R.id.switch_city);
+        refreshWeather.setOnClickListener(this);
+        switchCity.setOnClickListener(this);
         weatherDespText = (TextView) findViewById(R.id.weather_desp);
         temp1Text = (TextView) findViewById(R.id.temp1);
         temp2Text = (TextView) findViewById(R.id.temp2);
@@ -45,7 +53,7 @@ public class WeatherActivity extends AppCompatActivity {
             cityNameText.setVisibility(View.INVISIBLE);
             queryWeatherCode(countyCode);
         } else {
-            //没有代号时查询本地天气
+            //没有代号时查询上次所选城市天气
             showWeather();
         }
     }
@@ -125,6 +133,27 @@ public class WeatherActivity extends AppCompatActivity {
                 });
             }
         });
+
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.refresh_weather:
+                publishText.setText("同步中...");
+                SharedPreferences sp=PreferenceManager.getDefaultSharedPreferences(this);
+                String weatherCode=sp.getString("weather_code","");
+                if(!TextUtils.isEmpty(weatherCode)){
+                    queryWeatherInfo(weatherCode);
+                }
+                break;
+            case R.id.switch_city:
+                Intent intent=new Intent(this,ChooseAreaActivity.class);
+                intent.putExtra("switch_city",true);
+                startActivity(intent);
+                finish();
+                break;
+        }
 
     }
 }

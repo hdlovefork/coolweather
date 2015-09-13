@@ -65,12 +65,16 @@ public class ChooseAreaActivity extends AppCompatActivity {
      */
     private int currentLevel;
 
+    private boolean isSwitchCity;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(this);
-        if(sp.getBoolean("city_selected",false)){
-            Intent intent=new Intent(this,WeatherActivity.class);
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        isSwitchCity = getIntent().getBooleanExtra("switch_city", false);
+        //如果重新选择城市的话，将不再跳到天气信息活动
+        if (sp.getBoolean("city_selected", false) && !isSwitchCity) {
+            Intent intent = new Intent(this, WeatherActivity.class);
             startActivity(intent);
             finish();
             return;
@@ -231,6 +235,10 @@ public class ChooseAreaActivity extends AppCompatActivity {
                 queryProvinces();
                 break;
             default:
+                if(isSwitchCity){
+                    Intent intent=new Intent(this,WeatherActivity.class);
+                    startActivity(intent);
+                }
                 finish();
         }
     }
